@@ -8,9 +8,12 @@ class Player extends GameObject {
   float lastX;
   int idleTimer;
 
-  // ---- invincibility / blink ----
+  float keySpeed = 10;
+
+  // ---- invincibility / blink / shield ----
   int invincibleUntil = 0;
   int hitTime = -10000;
+  boolean hasShield = false;
 
   float getX() {
     return x;
@@ -40,22 +43,34 @@ class Player extends GameObject {
 
   // Called when a jeepney hits the player: 2 seconds of blinking + invincibility
   void hit() {
-    hitTime = millis();
+    hitTime = gameNow();
     invincibleUntil = hitTime + 2000;   // change 2000 to adjust the duration
   }
 
   boolean isInvincible() {
-    return millis() < invincibleUntil;
+    return gameNow() < invincibleUntil;
   }
 
   void reset() {
     invincibleUntil = 0;
     hitTime = -10000;
+    hasShield = false;
+    x = mouseX;
+    lastX = x;
+    currentImg = playerIdle;
   }
 
   @Override
   void update() {
-    setX(mouseX);
+
+    // keyboard (arrows or A/D) OR mouse
+    if (leftHeld || rightHeld) {
+      if (leftHeld)  x -= keySpeed;
+      if (rightHeld) x += keySpeed;
+    } else if (mouseX != pmouseX) {
+      x = mouseX;
+    }
+    x = constrain(x, 0, width);
 
     if (x > lastX + 2) {
       currentImg = playerRight;
@@ -84,5 +99,34 @@ class Player extends GameObject {
 
     image(currentImg, x, y, w, h);
     noTint();
+
+    if (hasShield) {
+      drawShield();
+    }
+  }
+
+  // ring of sampaguita petals around the player
+  void drawShield() {
+    pushMatrix();
+    translate(x, y);
+    rotate(millis() / 600.0);
+    noStroke();
+    for (int i = 0; i < 8; i++) {
+      float a = i * TWO_PI / 8;
+      pushMatrix();
+      translate(cos(a) * 62, sin(a) * 62);
+      rotate(a);
+      fill(255);
+      ellipse(0, 0, 22, 10);
+      fill(255, 210, 0);
+      ellipse(0, 0, 5, 5);
+      popMatrix();
+    }
+    popMatrix();
+
+    noFill();
+    stroke(255, 255, 255, 90);
+    strokeWeight(4);
+    ellipse(x, y, 124, 124);
   }
 }

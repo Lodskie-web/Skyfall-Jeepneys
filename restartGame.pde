@@ -1,22 +1,76 @@
 void restartGame() {
   lives = 3;
   jeepneys.clear();
+  pickups.clear();
+  popups.clear();
+
+  // game clock + countdown
+  gameMs = 0;
+  lastMillis = millis();
+  isPaused = false;
+  countdownActive = true;
+  countdownStart = millis();
+  lastCountStep = -1;
+
+  score = 0;
+  startFrame = frameCount;
+  scoreBoard = frameCount;
+  survivalTime = 0;
+  newHighScore = false;
+
+  // difficulty + events
+  nextJeepneyAt = int(random(15000, 20000));
+  nextRushAt = int(random(50000, 65000));
+  rushState = 0;
+  nextCoinAt = int(random(2500, 4500));
+  nextPowerupAt = int(random(9000, 14000));
+  slowMoUntil = 0;
+  lastNearMiss = -10000;
+
+  // environment
+  envPhase = 0;
+  rainAmount = 0;
+  lastEnvStage = 0;
+  nextLightning = 0;
+  lightningUntil = 0;
+
+  // HUD animation
+  lastScore = 0;
+  scorePopTime = -10000;
+
+  player.reset();
+  sfxStopAll();
 
   for (int i = 0; i < 5; i++) {
     jeepneys.add(new Jeepney());
   }
+}
 
-  score = 0;
-  startFrame = frameCount;
+// called when lives reach 0
+void endGame() {
+  gameState = 3;
+  isPaused = false;
+  bgMusic.stop();
+  sfxStopAll();
 
-  score = 0;
-  scoreBoard = frameCount;
+  finalTime = survivalTime;
+  newHighScore = score > bestScore;
+  if (newHighScore) {
+    bestScore = score;
+    saveBestScore();
+  }
+}
 
-  // reset HUD animation + invincibility for the new run
-  lastScore = 0;
-  scorePopTime = -10000;
-  player.reset();
+void loadBestScore() {
+  String path = dataPath("highscore.txt");
+  if (new File(path).exists()) {
+    String[] lines = loadStrings(path);
+    if (lines != null && lines.length > 0) {
+      bestScore = int(trim(lines[0]));
+    }
+  }
+}
 
-  // NEW: clear any leftover popups
-  popups.clear();
+void saveBestScore() {
+  saveStrings(dataPath("highscore.txt"), new String[] { str(bestScore) });
 }

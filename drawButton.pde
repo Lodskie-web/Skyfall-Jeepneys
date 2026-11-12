@@ -20,8 +20,8 @@ void drawButton(float x, float y,
     borderColor = color(120, 0, 0);
   }
 
-  // HOW TO PLAY + PLAY AGAIN = YELLOW (FIXED)
-  else if (label.equals("HOW TO PLAY") || label.equals("PLAY AGAIN")) {
+  // HOW TO PLAY + PLAY AGAIN + RESUME = YELLOW
+  else if (label.equals("HOW TO PLAY") || label.equals("PLAY AGAIN") || label.equals("RESUME")) {
     topColor = color(255, 230, 50);
     bottomColor = color(230, 170, 0);
     borderColor = color(160, 110, 0);
@@ -64,14 +64,21 @@ void drawButton(float x, float y,
   // ================= TEXT =================
   fill(255);
 
-  PFont boldFont = createFont("Arial Bold", 28);
-  textFont(boldFont);
+  textFont(fontBtn);
   textAlign(CENTER, CENTER);
 
-  // Black text for yellow button
-  if (label.equals("HOW TO PLAY") || label.equals("PLAY AGAIN")) {
+  // Black text for yellow buttons
+  if (label.equals("HOW TO PLAY") || label.equals("PLAY AGAIN") || label.equals("RESUME")) {
     fill(0);
   }
 
   text(label, x, y - 2);
+}
+
+// white text with a soft shadow (readable on any background)
+void shadowText(String s, float x, float y) {
+  fill(0, 170);
+  text(s, x + 2, y + 2);
+  fill(255);
+  text(s, x, y);
 }

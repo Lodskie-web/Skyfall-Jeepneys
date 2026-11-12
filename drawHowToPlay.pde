@@ -53,9 +53,7 @@ void drawHowToPlay() {
 
   fill(255);
 
-  PFont title = createFont("Arial Bold", 34);
-
-  textFont(title);
+  textFont(fontHowTitle);
 
   textSize(34);
 
@@ -67,9 +65,7 @@ void drawHowToPlay() {
 
   // =====================================================
 
-  PFont body = createFont("Arial Bold", 26);
-
-  textFont(body);
+  textFont(fontHowBody);
 
   textAlign(LEFT, CENTER);
 
@@ -99,7 +95,7 @@ void drawHowToPlay() {
 
   fill(0);
 
-  text("MOVE THE CHARACTER\nUSING THE MOUSE.", 340, 170);
+  text("MOVE WITH THE MOUSE OR\nARROWS. P = PAUSE.", 340, 170);
 
   // ================= ICON 2 =================
 
@@ -238,8 +234,9 @@ void drawHowToPlay() {
   // TEXT 4
   fill(0);
   textSize(26);
+  textAlign(LEFT, CENTER);
 
-  text("YOU HAVE ONLY 3 LIVES.", 500, 440);
+  text("3 LIVES. GRAB PANDESAL,\nKAPE, SAMPAGUITA & PISO!", 340, 440);
   // ================= BACK BUTTON =================
 
   drawButton(width/2, 625, 220, 55, "BACK");

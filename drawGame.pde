@@ -3,59 +3,69 @@
 // =====================================================================
 void drawGame() {
 
+  imageMode(CENTER);
+  rectMode(CENTER);
+
+  // ---------- game clock: only ticks while actually playing ----------
+  int now = millis();
+  int dt = min(now - lastMillis, 100);
+  lastMillis = now;
+
+  if (countdownActive) {
+    updateCountdown();
+    player.update();          // let the player line up during the countdown
+  }
+
+  boolean running = !isPaused && !countdownActive;
+
+  if (running) {
+    gameMs += dt;
+    survivalTime = gameMs / 1000;   // real seconds (stops while paused)
+    updateGame();
+  }
+
+  // ---------- draw the world ----------
   background(40, 70, 120);
   image(background, 80, 250, 1900, 800);
+  drawEnvOverlay(1.0);              // sunset / night tint on the background
 
-  survivalTime = (frameCount - startFrame) / 30;
-
-  player.update();
   player.display();
 
   for (Jeepney j : jeepneys) {
-
-    j.update();
     j.display();
-
-    // ---------- Collision ----------
-    if (!j.scored && j.hitPlayer(player)) {
-      j.scored = true;   // a jeepney that touched you never gives points
-
-      // Only lose a life if the player is NOT invincible
-      if (!player.isInvincible()) {
-        lives--;
-        player.hit();        // starts the 2-second blink + invincibility
-        popups.add(new PopText("ARAY!", player.getX(), player.getY() - 80));   // NEW
-        bgMusic2.play();
-
-        for (Jeepney jeep : jeepneys) {
-          jeep.slowDown();
-        }
-
-        if (lives <= 0) {
-          gameState = 3;
-          bgMusic.stop();
-        }
-      }
-    }
-
-    // ---------- Score when jeepney passes player ----------
-    if (!j.scored && j.y > player.y) {
-      score++;
-      j.scored = true;
-    }
+  }
+  for (Pickup p : pickups) {
+    p.display();
   }
 
-  // ---------- NEW: ARAY! popups ----------
+  drawEnvOverlay(0.35);             // lighter tint over the vehicles too
+  drawRain();
+
+  // coffee slow-mo tint
+  if (gameNow() < slowMoUntil) {
+    noStroke();
+    fill(150, 90, 30, 40);
+    rect(width/2, height/2, width, height);
+  }
+
+  // floating popups (ARAY!, SAKTO!, ...)
   for (int i = popups.size() - 1; i >= 0; i--) {
-    PopText p = popups.get(i);
-    p.display();
-    if (p.isDead()) {
+    PopText pt = popups.get(i);
+    pt.display();
+    if (pt.isDead()) {
       popups.remove(i);
     }
   }
 
-  // HUD is drawn LAST so it always sits on top of the jeepneys
+  // HUD is drawn LAST so it always sits on top
   drawHUD();
+
+  if (countdownActive) {
+    drawCountdown();
+  }
+  if (isPaused) {
+    drawPauseMenu();
+  }
 }
 
 // =====================================================================
@@ -81,6 +91,9 @@ void drawHUD() {
   drawScorePanel(130,         baseY + sin(t) * 2);
   drawLivesPanel(width / 2,   baseY + sin(t + 1.5) * 2);
   drawTimePanel(width - 130,  baseY + sin(t + 3.0) * 2);
+
+  drawStatusChips();
+  drawRushBanner();
 }
 
 // Banderitas (fiesta bunting) swaying across the top
@@ -192,17 +205,22 @@ void drawLivesPanel(float cx, float cy) {
   drawHudPanel(cx, cy, 200, 50, "LIVES LEFT", border);
 
   // little shake right after getting hit
-  float sinceHit = millis() - player.hitTime;
+  float sinceHit = gameNow() - player.hitTime;
   float shake = (sinceHit < 400) ? random(-3, 3) : 0;
 
   // heartbeat, faster when only 1 life remains
   float beatSpeed = (lives == 1) ? 90.0 : 180.0;
   float beat = 1 + 0.12 * sin(millis() / beatSpeed);
 
-  for (int i = 0; i < 3; i++) {
+  // 3 hearts normally, more when you collect pandesal
+  int n = max(3, lives);
+  float spacing = (n <= 3) ? 50 : 38;
+  float heartSize = (n <= 3) ? 30 : 26;
+
+  for (int i = 0; i < n; i++) {
 
     pushMatrix();
-    translate(cx + (i - 1) * 50 + shake, cy + 6);
+    translate(cx + (i - (n - 1) / 2.0) * spacing + shake, cy + 6);
 
     if (i < lives) {
       scale(beat);
@@ -220,7 +238,7 @@ void drawLivesPanel(float cx, float cy) {
       fill(210, 200, 180);
     }
 
-    drawHeart(0, 0, 30);
+    drawHeart(0, 0, heartSize);
     popMatrix();
   }
 }
@@ -250,6 +268,80 @@ void drawTimePanel(float cx, float cy) {
   drawHudValue(survivalTime + "s", cx + 22, cy + 6, 1, color(0, 40, 120));
 }
 
+// small pills under the score panel for active power-ups
+void drawStatusChips() {
+  float chipX = 95;
+  float chipY = 125;
+
+  if (gameNow() < slowMoUntil) {
+    float frac = (slowMoUntil - gameNow()) / (float) SLOWMO_MS;
+    drawStatusChip(chipX, chipY, 2, "SLOW-MO", frac);
+    chipX += 140;
+  }
+  if (player.hasShield) {
+    drawStatusChip(chipX, chipY, 3, "SHIELD", -1);
+  }
+}
+
+void drawStatusChip(float x, float y, int iconType, String label, float frac) {
+
+  rectMode(CENTER);
+  stroke(180, 130, 20);
+  strokeWeight(3);
+  fill(245, 235, 210);
+  rect(x, y, 130, 32, 12);
+
+  pushMatrix();
+  translate(x - 47, y + 2);
+  scale(0.6);
+  if (iconType == 2) {
+    drawKapeIcon(millis() / 1000.0);
+  } else {
+    drawSampaguitaIcon(millis() / 1000.0);
+  }
+  popMatrix();
+
+  noStroke();
+  fill(0, 40, 120);
+  textFont(hudFont);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  text(label, x + 14, (frac >= 0) ? y - 5 : y);
+
+  // time-left bar
+  if (frac >= 0) {
+    fill(200, 190, 160);
+    rect(x + 14, y + 8, 70, 5, 3);
+    fill(220, 40, 40);
+    float w = 70 * constrain(frac, 0, 1);
+    rect(x - 21 + w / 2, y + 8, w, 5, 3);
+  }
+}
+
+// flashing banner during rush hour
+void drawRushBanner() {
+
+  if (rushState == 0) return;
+
+  boolean flash = (millis() / 250) % 2 == 0;
+  String msg = (rushState == 1) ? "RUSH HOUR PAPARATING!" : "RUSH HOUR!";
+  color bg = flash ? color(220, 40, 40) : color(255, 210, 0);
+  color fg = flash ? color(255) : color(0, 40, 120);
+
+  rectMode(CENTER);
+  stroke(0, 40, 120);
+  strokeWeight(4);
+  fill(bg);
+  rect(width/2, 135, 380, 42, 12);
+
+  fill(fg);
+  noStroke();
+  textFont(hudFont);
+  textAlign(CENTER, CENTER);
+  textSize(24);
+  text(msg, width/2, 134);
+}
+
 // 5-point star
 void drawStar(float cx, float cy, float outerR, float innerR) {
   beginShape();
@@ -268,4 +360,59 @@ void drawHeart(float cx, float cy, float s) {
   bezierVertex(cx - s * 0.6, cy - s * 0.1, cx - s * 0.5, cy - s * 0.6, cx, cy - s * 0.25);
   bezierVertex(cx + s * 0.5, cy - s * 0.6, cx + s * 0.6, cy - s * 0.1, cx, cy + s * 0.35);
   endShape(CLOSE);
+}
+
+// =====================================================================
+//  PAUSE MENU
+// =====================================================================
+float pauseBtnY(int i) {
+  return height/2 - 90 + i * 80;
+}
+
+void drawPauseMenu() {
+
+  rectMode(CENTER);
+
+  // dim everything behind
+  noStroke();
+  fill(0, 0, 0, 150);
+  rect(width/2, height/2, width, height);
+
+  // panel
+  fill(245, 235, 210);
+  stroke(180, 130, 20);
+  strokeWeight(8);
+  rect(width/2, height/2, 420, 440, 25);
+
+  noFill();
+  stroke(230, 180, 40);
+  strokeWeight(3);
+  rect(width/2, height/2, 390, 410, 18);
+
+  // title banner
+  fill(0, 90, 220);
+  stroke(0, 40, 120);
+  strokeWeight(4);
+  rect(width/2, height/2 - 160, 260, 56, 12);
+
+  fill(220, 40, 40);
+  noStroke();
+  ellipse(width/2 - 115, height/2 - 160, 10, 10);
+  ellipse(width/2 + 115, height/2 - 160, 10, 10);
+
+  fill(255);
+  textFont(fontHowTitle);
+  textAlign(CENTER, CENTER);
+  textSize(34);
+  text("PAUSED", width/2, height/2 - 158);
+
+  drawButton(width/2, pauseBtnY(0), 280, 64, "RESUME");
+  drawButton(width/2, pauseBtnY(1), 280, 64, muted ? "SOUND: OFF" : "SOUND: ON");
+  drawButton(width/2, pauseBtnY(2), 280, 64, "QUIT TO MENU");
+
+  fill(90, 60, 10);
+  textFont(hudFont);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text("P / ESC = RESUME     M = MUTE", width/2, height/2 + 180);
 }

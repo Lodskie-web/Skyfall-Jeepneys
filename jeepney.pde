@@ -1,46 +1,64 @@
 class Jeepney extends GameObject {
-  float speed;
   float normalSpeed;
+  int lane;
 
-  boolean scored = false;
-  boolean slowed = false;
-  int slowUntil = 0;
+  boolean hit = false;        // already crashed into the player on this pass
+  boolean passed = false;     // already went past the player (score was checked)
+  float minDist = 99999;      // closest it got to the player (for SAKTO!)
+  boolean rush = false;       // part of a rush-hour wave (removed when off-screen)
+  boolean dead = false;
+  int hitSlowUntil = 0;
 
+  // normal jeepney: respawns forever in a free lane
   Jeepney() {
-
-    super(
-      random(width),
-      random(-500, -100), 120, 160);
-
+    super(width / 2, -300, 120, 160);
     normalSpeed = random(5, 10);
-    speed = normalSpeed;
+    respawn();
   }
+
+  // rush-hour jeepney: one-time, in a chosen lane
+  Jeepney(int laneIdx, float startY, float spd) {
+    super(laneX(laneIdx) + random(-15, 15), startY, 120, 160);
+    lane = laneIdx;
+    normalSpeed = spd;
+    rush = true;
+  }
+
+  void respawn() {
+    float newY = random(-450, -100);
+    lane = pickFreeLane(newY, this);
+    x = laneX(lane) + random(-15, 15);   // small jitter so lane borders aren't permanently safe
+    y = newY;
+    hit = false;
+    passed = false;
+    minDist = 99999;
+  }
+
   @Override
   void update() {
 
-    if (slowed && millis() > slowUntil) {
-      speed = normalSpeed;
-      slowed = false;
-    }
+    float mult = 1;
+    if (gameNow() < hitSlowUntil) mult *= 0.4;   // slowed after you get hit
+    if (gameNow() < slowMoUntil)  mult *= 0.5;   // kape slow-mo
 
-    y += speed;
+    y += normalSpeed * mult;
+    normalSpeed = min(normalSpeed + 0.001, 14);  // slowly gets faster
 
-    if (!slowed) {
-      speed += 0.001;
-      normalSpeed += 0.001;
-    }
-
-    if (y > height) {
-      y = random(-300, -50);
-      x = random(width);
-      scored = false;
+    if (y > height + 90) {
+      if (rush) {
+        dead = true;
+      } else {
+        respawn();
+      }
     }
   }
 
   @Override
   void display() {
     imageMode(CENTER);
+    if (rush) tint(255, 215, 215);   // rush-hour jeepneys look slightly red
     image(jeepney1, x, y, w, h);
+    noTint();
   }
 
   boolean hitPlayer(Player p) {
@@ -48,8 +66,6 @@ class Jeepney extends GameObject {
   }
 
   void slowDown() {
-    slowed = true;
-    speed = normalSpeed * 0.4;
-    slowUntil = millis() + 3000;
+    hitSlowUntil = gameNow() + 3000;
   }
 }

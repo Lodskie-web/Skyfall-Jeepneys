@@ -1,27 +1,35 @@
 class PopText {
   String msg;
   float x, y;
+  float txtSize;
   int born;
-  int life = 1000;   // how long it stays on screen (ms)
+  int life;
+  color fillC;
+  color outlineC;
 
-  PopText(String msg, float x, float y) {
+  PopText(String msg, float x, float y, color fillC, color outlineC, float txtSize, int life) {
     this.msg = msg;
-    this.x = constrain(x, 80, width - 80);   // keep it on screen
+    this.x = constrain(x, 160, width - 160);   // keep it on screen
     this.y = y;
-    this.born = millis();
+    this.fillC = fillC;
+    this.outlineC = outlineC;
+    this.txtSize = txtSize;
+    this.life = life;
+    this.born = gameNow();                      // uses the game clock, so it freezes while paused
   }
 
   boolean isDead() {
-    return millis() - born > life;
+    return gameNow() - born > life;
   }
 
   void display() {
-    float p = (millis() - born) / (float) life;   // 0 -> 1 over its lifetime
+    float p = constrain((gameNow() - born) / (float) life, 0, 1);
 
     float rise   = p * 70;                          // floats upward
     float alpha  = 255 * (1 - p * p);               // fades out near the end
     float pop    = 1 + 0.5 * max(0, 1 - p * 6);     // big "pop" at the start
-    float wobble = sin(millis() / 40.0) * 0.12 * (1 - p);   // shakes like "ouch!"
+    float wobbleAmt = (life <= 1200) ? 0.12 : 0.02; // short popups shake like "ouch!"
+    float wobble = sin(millis() / 40.0) * wobbleAmt * (1 - p);
 
     pushMatrix();
     translate(x, y - rise);
@@ -30,20 +38,25 @@ class PopText {
 
     textFont(hudFont);
     textAlign(CENTER, CENTER);
-    textSize(46);
+    textSize(txtSize);
 
-    // white outline
-    fill(255, alpha);
-    for (int dx = -3; dx <= 3; dx += 3) {
-      for (int dy = -3; dy <= 3; dy += 3) {
-        text(msg, dx, dy);
+    // outline
+    float o = txtSize / 15.0;
+    fill(outlineC, alpha);
+    for (int dx = -1; dx <= 1; dx++) {
+      for (int dy = -1; dy <= 1; dy++) {
+        text(msg, dx * o, dy * o);
       }
     }
 
-    // red text on top
-    fill(220, 40, 40, alpha);
+    // main text on top
+    fill(fillC, alpha);
     text(msg, 0, 0);
 
     popMatrix();
   }
+}
+
+void popup(String msg, float x, float y, color fillC, color outlineC, float txtSize, int life) {
+  popups.add(new PopText(msg, x, y, fillC, outlineC, txtSize, life));
 }
