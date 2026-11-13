@@ -1,3 +1,12 @@
+// press H during a game to show / hide the hitboxes
+boolean showHitboxes = false;
+
+// true when two rectangles (left, top, right, bottom) overlap
+boolean rectsOverlap(float l1, float t1, float r1, float b1,
+                     float l2, float t2, float r2, float b2) {
+  return l1 < r2 && r1 > l2 && t1 < b2 && b1 > t2;
+}
+
 class Player extends GameObject {
 
   PImage playerIdle;
@@ -14,6 +23,12 @@ class Player extends GameObject {
   int invincibleUntil = 0;
   int hitTime = -10000;
   boolean hasShield = false;
+
+  // ---- hitbox (tune these to match your sprite; press H in-game to see them) ----
+  float headW = 40;      // width of the head box
+  float headH = 42;      // head box height, measured down from the top of the sprite
+  float bodyW = 30;      // width of the body box under the head
+  float feetTrim = 8;    // pixels ignored at the very bottom of the sprite
 
   float getX() {
     return x;
@@ -39,6 +54,22 @@ class Player extends GameObject {
 
     lastX = x;
     idleTimer = millis();
+  }
+
+  // true if the box (left, top, right, bottom) touches the head OR the body
+  boolean hitsBox(float l, float t, float r, float b) {
+
+    float top = y - h/2;
+
+    boolean head = rectsOverlap(l, t, r, b,
+                                x - headW/2, top,
+                                x + headW/2, top + headH);
+
+    boolean body = rectsOverlap(l, t, r, b,
+                                x - bodyW/2, top + headH,
+                                x + bodyW/2, y + h/2 - feetTrim);
+
+    return head || body;
   }
 
   // Called when a jeepney hits the player: 2 seconds of blinking + invincibility
@@ -103,6 +134,28 @@ class Player extends GameObject {
     if (hasShield) {
       drawShield();
     }
+
+    if (showHitboxes) {
+      drawHitboxes();
+    }
+  }
+
+  // red = head box, orange = body box
+  void drawHitboxes() {
+
+    float top = y - h/2;
+
+    rectMode(CORNERS);
+    noFill();
+    strokeWeight(2);
+
+    stroke(255, 0, 0);
+    rect(x - headW/2, top, x + headW/2, top + headH);
+
+    stroke(255, 160, 0);
+    rect(x - bodyW/2, top + headH, x + bodyW/2, y + h/2 - feetTrim);
+
+    rectMode(CENTER);
   }
 
   // ring of sampaguita petals around the player

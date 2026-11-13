@@ -16,7 +16,8 @@ void restartGame() {
   startFrame = frameCount;
   scoreBoard = frameCount;
   survivalTime = 0;
-  newHighScore = false;
+  ribbonKind = 0;
+  lastRank = 0;
 
   // difficulty + events
   nextJeepneyAt = int(random(15000, 20000));
@@ -54,23 +55,5 @@ void endGame() {
   sfxStopAll();
 
   finalTime = survivalTime;
-  newHighScore = score > bestScore;
-  if (newHighScore) {
-    bestScore = score;
-    saveBestScore();
-  }
-}
-
-void loadBestScore() {
-  String path = dataPath("highscore.txt");
-  if (new File(path).exists()) {
-    String[] lines = loadStrings(path);
-    if (lines != null && lines.length > 0) {
-      bestScore = int(trim(lines[0]));
-    }
-  }
-}
-
-void saveBestScore() {
-  saveStrings(dataPath("highscore.txt"), new String[] { str(bestScore) });
+  submitScore(score, finalTime);    // saves to the leaderboard under the logged-in name
 }

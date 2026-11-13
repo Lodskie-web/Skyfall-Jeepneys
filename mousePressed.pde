@@ -3,22 +3,58 @@ void mousePressed() {
   // ================= MENU =================
   if (gameState == 0) {
 
-    if (overButton(width/2, 375, 250, 60)) {
-      restartGame();
-      bgMusic.loop();
-      bgMusic1.stop();
-      gameState = 1;
+    // the "delete player?" window is open: only its two buttons work
+    if (confirmDelete) {
+      if (overButton(width/2 - 120, 425, 200, 54)) {
+        deleteCurrentPlayer();
+        confirmDelete = false;
+        return;
+      }
+      if (overButton(width/2 + 120, 425, 200, 54)) {
+        confirmDelete = false;
+        return;
+      }
       return;
     }
 
-    if (overButton(width/2, 455, 250, 60)) {
+    if (overButton(width/2, 375, 270, 54)) {
+      if (playerName.length() == 0) {
+        openNameEntry(true);      // first time: log in, then start playing
+      } else {
+        startGame();
+      }
+      return;
+    }
+
+    if (overButton(width/2, 440, 270, 54)) {
       gameState = 2;
       bgMusic.stop();
       return;
     }
 
-    if (overButton(width/2, 545, 250, 60)) {
+    if (overButton(width/2, 505, 270, 54)) {
+      openLeaderboard(0);
+      return;
+    }
+
+    if (overButton(width/2, 570, 270, 54)) {
       exit();
+      return;
+    }
+
+    // player chip: pencil = edit name, trash = delete, name area = switch player
+    if (overPlayerEdit()) {
+      openEditName();
+      return;
+    }
+
+    if (overPlayerDelete()) {
+      confirmDelete = true;
+      return;
+    }
+
+    if (overPlayerSwitch()) {
+      openNameEntry(false);
       return;
     }
   }
@@ -48,7 +84,6 @@ void mousePressed() {
   // ================= HOW TO PLAY =================
   else if (gameState == 2) {
 
-    // FIXED: the button is drawn at y=625 (this used to check 640)
     if (overButton(width/2, 625, 220, 55)) {
       gameState = 0;
       return;
@@ -58,15 +93,62 @@ void mousePressed() {
   // ================= GAME OVER =================
   else if (gameState == 3) {
 
-    if (overButton(350, 520, 280, 70)) {
-      restartGame();
-      bgMusic.loop();
-      gameState = 1;
+    if (overButton(170, 565, 260, 62)) {
+      startGame();
       return;
     }
 
-    if (overButton(650, 520, 280, 70)) {
+    if (overButton(500, 565, 260, 62)) {
+      openLeaderboard(3);
+      return;
+    }
+
+    if (overButton(830, 565, 260, 62)) {
       goToMenu();
+      return;
+    }
+  }
+
+  // ================= PLAYER LOGIN / EDIT NAME =================
+  else if (gameState == 4) {
+
+    if (overButton(width/2 - 130, 520, 240, 56)) {
+      submitName();
+      return;
+    }
+
+    if (overButton(width/2 + 130, 520, 200, 56)) {
+      gameState = 0;
+      return;
+    }
+
+    // returning players (only on the login screen, not while editing)
+    if (!editingName) {
+      for (int i = 0; i < recentNames.size(); i++) {
+        if (overButton(nameChipX(i), nameChipY(i), 180, 40)) {
+          loginAs(recentNames.get(i));
+          return;
+        }
+      }
+    }
+  }
+
+  // ================= LEADERBOARD =================
+  else if (gameState == 5) {
+
+    if (overButton(300, 614, 220, 50)) {
+      gameState = leaderboardFrom;
+      return;
+    }
+
+    // CLEAR SCORES needs two clicks within 3 seconds
+    if (overButton(700, 614, 280, 50)) {
+      if (millis() < clearArmedUntil) {
+        clearLeaderboard();
+        clearArmedUntil = 0;
+      } else {
+        clearArmedUntil = millis() + 3000;
+      }
       return;
     }
   }
@@ -77,13 +159,25 @@ void keyPressed() {
   // ESC normally closes the sketch: block that and use it as pause / back
   if (key == ESC) {
     key = 0;
-    if (gameState == 1) {
+    if (gameState == 0) {
+      confirmDelete = false;
+    } else if (gameState == 1) {
       togglePause();
     } else if (gameState == 2) {
       gameState = 0;
     } else if (gameState == 3) {
       goToMenu();
+    } else if (gameState == 4) {
+      gameState = 0;
+    } else if (gameState == 5) {
+      gameState = leaderboardFrom;
     }
+    return;
+  }
+
+  // typing your name: letters must NOT trigger movement / pause / mute
+  if (gameState == 4) {
+    handleNameKey();
     return;
   }
 
@@ -95,6 +189,9 @@ void keyPressed() {
     if (key == 'd' || key == 'D') rightHeld = true;
     if (key == 'p' || key == 'P') togglePause();
     if (key == 'm' || key == 'M') toggleMute();
+
+    // H = show / hide the collision hitboxes (handy for tuning)
+    if ((key == 'h' || key == 'H') && gameState == 1) showHitboxes = !showHitboxes;
   }
 }
 
@@ -118,9 +215,18 @@ boolean overButton(float x, float y,
     mouseY < y + h/2;
 }
 
+// starts a fresh run (menu START GAME, PLAY AGAIN, or right after logging in)
+void startGame() {
+  restartGame();
+  bgMusic.loop();
+  bgMusic1.stop();
+  gameState = 1;
+}
+
 void goToMenu() {
   isPaused = false;
   countdownActive = false;
+  confirmDelete = false;
   gameState = 0;
   bgMusic.stop();
   bgMusic1.loop();

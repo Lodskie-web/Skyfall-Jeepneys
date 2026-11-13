@@ -59,10 +59,23 @@ class Jeepney extends GameObject {
     if (rush) tint(255, 215, 215);   // rush-hour jeepneys look slightly red
     image(jeepney1, x, y, w, h);
     noTint();
+
+    // blue box = the jeepney's hitbox (press H in-game)
+    if (showHitboxes) {
+      rectMode(CORNERS);
+      noFill();
+      stroke(0, 200, 255);
+      strokeWeight(2);
+      rect(x - w * 0.36, y - h * 0.42, x + w * 0.36, y + h * 0.42);
+      rectMode(CENTER);
+    }
   }
 
+  // Rectangle collision: the jeepney's box against the player's HEAD box and BODY box.
+  // The jeepney box is a bit smaller than the picture so near-misses feel fair.
   boolean hitPlayer(Player p) {
-    return dist(x, y, p.getX(), p.getY()) < 60;
+    return p.hitsBox(x - w * 0.36, y - h * 0.42,
+                     x + w * 0.36, y + h * 0.42);
   }
 
   void slowDown() {

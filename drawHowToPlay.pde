@@ -1,6 +1,6 @@
 void drawHowToPlay() {
 
-  background(255, 210, 40);
+  drawFilipinoBackground();
 
   rectMode(CENTER);
 
@@ -95,7 +95,7 @@ void drawHowToPlay() {
 
   fill(0);
 
-  text("MOVE WITH THE MOUSE OR\nARROWS. P = PAUSE.", 340, 170);
+  text("MOVE WITH THE MOUSE OR\nARROWS / A-D. P = PAUSE.", 340, 170);
 
   // ================= ICON 2 =================
 

@@ -1,10 +1,17 @@
 void drawMenu() {
   imageMode(CORNER);
   image(background1, 0, 0, width, height);
-  
-  drawButton(width/2, 375, 250, 60, "START GAME");
-  drawButton(width/2, 455, 250, 60, "HOW TO PLAY");
-  drawButton(width/2, 545, 250, 60, "QUIT");
 
- 
+  drawButton(width/2, 375, 270, 54, "START GAME");
+  drawButton(width/2, 440, 270, 54, "HOW TO PLAY");
+  drawButton(width/2, 505, 270, 54, "LEADERBOARD");
+  drawButton(width/2, 570, 270, 54, "QUIT");
+
+  // decorated player chip with edit / delete (top-left)
+  drawPlayerChip();
+
+  // "delete player?" window
+  if (confirmDelete) {
+    drawDeleteConfirm();
+  }
 }

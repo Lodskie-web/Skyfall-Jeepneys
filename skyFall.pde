@@ -12,7 +12,7 @@ ArrayList<PopText> popups = new ArrayList<PopText>();
 
 int startFrame = 0;
 int scoreBoard = 0;
-int gameState = 0;      // 0 = menu, 1 = game, 2 = how to play, 3 = game over
+int gameState = 0;      // 0 = menu, 1 = game, 2 = how to play, 3 = game over, 4 = player login, 5 = leaderboard
 int score = 0;
 int survivalTime = 0;
 int lives = 3;
@@ -58,9 +58,8 @@ float[] rainX = new float[160];
 float[] rainY = new float[160];
 float[] rainSpd = new float[160];
 
-// ---- high score ----
-int bestScore = 0;
-boolean newHighScore = false;
+// ---- results of the last run (the leaderboard itself lives in leaderboard.pde) ----
+int bestScore = 0;          // the current player's best score
 int finalTime = 0;
 
 // ---- HUD animation state ----
@@ -118,7 +117,7 @@ void setup() {
   fontHowBody = createFont("Arial Bold", 26);
 
   initRain();
-  loadBestScore();
+  initLeaderboard();     // loads the saved player name + leaderboard
 }
 
 void draw() {
@@ -139,6 +138,14 @@ void draw() {
 
   else if (gameState == 3) {
     drawGameOver();
+  }
+
+  else if (gameState == 4) {
+    drawNameEntry();
+  }
+
+  else if (gameState == 5) {
+    drawLeaderboard();
   }
 
   sfxUpdate();
