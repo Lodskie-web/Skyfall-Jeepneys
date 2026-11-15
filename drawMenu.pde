@@ -7,11 +7,6 @@ void drawMenu() {
   drawButton(width/2, 505, 270, 54, "LEADERBOARD");
   drawButton(width/2, 570, 270, 54, "QUIT");
 
-  // decorated player chip with edit / delete (top-left)
-  drawPlayerChip();
-
-  // "delete player?" window
-  if (confirmDelete) {
-    drawDeleteConfirm();
-  }
+  // player chip (top-left)
+  drawPlayerChip(125, 42, 230, 52);
 }

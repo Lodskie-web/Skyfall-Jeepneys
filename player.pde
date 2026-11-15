@@ -56,18 +56,22 @@ class Player extends GameObject {
     idleTimer = millis();
   }
 
+  // ---- the head box and the body box (screen coordinates) ----
+  float headL() { return x - headW/2; }
+  float headR() { return x + headW/2; }
+  float headT() { return y - h/2; }
+  float headB() { return y - h/2 + headH; }
+
+  float bodyL() { return x - bodyW/2; }
+  float bodyR() { return x + bodyW/2; }
+  float bodyT() { return y - h/2 + headH; }
+  float bodyB() { return y + h/2 - feetTrim; }
+
   // true if the box (left, top, right, bottom) touches the head OR the body
   boolean hitsBox(float l, float t, float r, float b) {
 
-    float top = y - h/2;
-
-    boolean head = rectsOverlap(l, t, r, b,
-                                x - headW/2, top,
-                                x + headW/2, top + headH);
-
-    boolean body = rectsOverlap(l, t, r, b,
-                                x - bodyW/2, top + headH,
-                                x + bodyW/2, y + h/2 - feetTrim);
+    boolean head = rectsOverlap(l, t, r, b, headL(), headT(), headR(), headB());
+    boolean body = rectsOverlap(l, t, r, b, bodyL(), bodyT(), bodyR(), bodyB());
 
     return head || body;
   }
@@ -143,17 +147,15 @@ class Player extends GameObject {
   // red = head box, orange = body box
   void drawHitboxes() {
 
-    float top = y - h/2;
-
     rectMode(CORNERS);
     noFill();
     strokeWeight(2);
 
     stroke(255, 0, 0);
-    rect(x - headW/2, top, x + headW/2, top + headH);
+    rect(headL(), headT(), headR(), headB());
 
     stroke(255, 160, 0);
-    rect(x - bodyW/2, top + headH, x + bodyW/2, y + h/2 - feetTrim);
+    rect(bodyL(), bodyT(), bodyR(), bodyB());
 
     rectMode(CENTER);
   }

@@ -6,15 +6,17 @@ void openNameEntry(boolean thenStart) {
   nameInput = "";
   startAfterName = thenStart;
   editingName = false;
+  confirmDelete = false;
   nameErrorUntil = 0;
   gameState = 4;
 }
 
-// rename the current player (pencil button on the menu chip)
+// rename the current player (EDIT NAME button on the login screen)
 void openEditName() {
   nameInput = playerName;
   startAfterName = false;
   editingName = true;
+  confirmDelete = false;
   nameErrorUntil = 0;
   gameState = 4;
 }
@@ -78,10 +80,12 @@ float nameChipX(int i) {
 }
 
 float nameChipY(int i) {
-  return 368 + (i / 3) * 52;
+  return 372 + (i / 3) * 44;
 }
 
 void drawNameEntry() {
+
+  boolean loggedIn = playerName.length() > 0;
 
   drawFilipinoBackground();
   rectMode(CENTER);
@@ -159,24 +163,31 @@ void drawNameEntry() {
     text("LETTERS, NUMBERS AND SPACE  -  MAX " + MAX_NAME + "  -  ENTER TO SAVE", width/2, 268);
   }
 
+  // who is logged in right now (EDIT NAME / DELETE act on this player)
+  if (loggedIn && !editingName) {
+    textSize(18);
+    fill(0, 90, 220);
+    text("CURRENT PLAYER: " + playerName, width/2, 298);
+  }
+
   // ================= RETURNING PLAYERS (login only) =================
   if (editingName) {
 
     textSize(18);
     fill(0, 90, 220);
-    text("RENAMING KEEPS YOUR SCORES", width/2, 340);
+    text("RENAMING KEEPS YOUR SCORES", width/2, 335);
 
   } else if (recentNames.size() > 0) {
 
     textSize(17);
     fill(0, 90, 220);
-    text("RETURNING PLAYERS - CLICK YOUR NAME", width/2, 318);
+    text("RETURNING PLAYERS - CLICK YOUR NAME", width/2, 332);
 
     for (int i = 0; i < recentNames.size(); i++) {
 
       float cx = nameChipX(i);
       float cy = nameChipY(i);
-      boolean hover = overButton(cx, cy, 180, 40);
+      boolean hover = overButton(cx, cy, 180, 38);
 
       if (hover) {
         stroke(0, 90, 220);
@@ -186,7 +197,7 @@ void drawNameEntry() {
         fill(255, 247, 225);
       }
       strokeWeight(3);
-      rect(cx, cy, 180, 40, 12);
+      rect(cx, cy, 180, 38, 12);
 
       noStroke();
       fill(0, 40, 120);
@@ -198,7 +209,19 @@ void drawNameEntry() {
   }
 
   // ================= BUTTONS =================
+  // top row: EDIT NAME + DELETE (only when someone is logged in and not already editing)
+  if (loggedIn && !editingName) {
+    drawButton(370, 462, 240, 46, "EDIT NAME");
+    drawButton(630, 462, 240, 46, "DELETE");
+  }
+
+  // bottom row: SAVE + BACK
   String saveLabel = (!editingName && startAfterName) ? "SAVE & PLAY" : "SAVE";
-  drawButton(width/2 - 130, 520, 240, 56, saveLabel);
-  drawButton(width/2 + 130, 520, 200, 56, "BACK");
+  drawButton(370, 519, 240, 50, saveLabel);
+  drawButton(630, 519, 240, 50, "BACK");
+
+  // "delete player?" window on top of everything
+  if (confirmDelete) {
+    drawDeleteConfirm();
+  }
 }

@@ -1,6 +1,6 @@
 void drawButton(float x, float y,
-                float w, float h,
-                String label) {
+  float w, float h,
+  String label) {
 
   boolean hover =
     mouseX > x - w/2 &&
@@ -8,13 +8,17 @@ void drawButton(float x, float y,
     mouseY > y - h/2 &&
     mouseY < y + h/2;
 
-  // red = START GAME / CLEAR SCORES / DELETE, yellow = HOW TO PLAY / PLAY AGAIN / RESUME / SAVE,
-  // white = LEADERBOARD, blue = the rest
+  // red    = START GAME / CLEAR SCORES / DELETE
+  // yellow = HOW TO PLAY / PLAY AGAIN / RESUME / SAVE
+  // white  = LEADERBOARD
+  // orange = EDIT NAME
+  // blue   = everything else (including BACK)
   boolean isRed = label.equals("START GAME") || label.equals("CLEAR SCORES")
-               || label.equals("DELETE") || label.startsWith("CONFIRM");
+    || label.equals("DELETE") || label.startsWith("CONFIRM");
   boolean isYellow = label.equals("HOW TO PLAY") || label.equals("PLAY AGAIN")
-                  || label.equals("RESUME") || label.startsWith("SAVE");
+    || label.equals("RESUME") || label.startsWith("SAVE");
   boolean isWhite = label.equals("LEADERBOARD");
+  boolean isOrange = label.equals("EDIT NAME");
 
   // ================= BUTTON COLORS =================
   color topColor;
@@ -25,38 +29,27 @@ void drawButton(float x, float y,
     topColor = color(255, 80, 60);
     bottomColor = color(180, 20, 20);
     borderColor = color(120, 0, 0);
-  }
-
-  else if (isYellow) {
+  } else if (isYellow) {
     topColor = color(255, 230, 50);
     bottomColor = color(230, 170, 0);
     borderColor = color(160, 110, 0);
-  }
-
-  else if (isWhite) {
+  } else if (isWhite) {
     topColor = color(255);
     bottomColor = color(196, 210, 238);
     borderColor = color(0, 40, 120);
-  }
-
-  else {
+  } else if (isOrange) {
+    topColor = color(245, 135, 35);
+    bottomColor = color(190, 70, 0);
+    borderColor = color(120, 45, 0);
+  } else {
     topColor = color(70, 140, 255);
     bottomColor = color(20, 70, 200);
     borderColor = color(0, 40, 120);
   }
 
-  // Hover glow (gold on the white button so it stays visible)
-  if (hover) {
-    if (isWhite) {
-      stroke(255, 200, 0);
-    } else {
-      stroke(255);
-    }
-    strokeWeight(4);
-  } else {
-    stroke(borderColor);
-    strokeWeight(3);
-  }
+  // Hover glow
+  stroke(hover ? color(255) : borderColor);
+  strokeWeight(hover ? 4 : 3);
 
   // ================= MAIN BUTTON =================
   fill(bottomColor);
@@ -71,12 +64,8 @@ void drawButton(float x, float y,
   fill(lerpColor(topColor, bottomColor, 0.5));
   rect(x, y + 8, w - 8, h - 20, 12);
 
-  // Decorative circles (red on the white button, white on the others)
-  if (isWhite) {
-    fill(220, 40, 40);
-  } else {
-    fill(255, 220);
-  }
+  // Decorative circles
+  fill(255, 220);
   ellipse(x - w/2 + 18, y, 10, 10);
   ellipse(x + w/2 - 18, y, 10, 10);
 

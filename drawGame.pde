@@ -366,7 +366,7 @@ void drawHeart(float cx, float cy, float s) {
 //  PAUSE MENU
 // =====================================================================
 float pauseBtnY(int i) {
-  return height/2 - 90 + i * 80;
+  return height/2 - 60 + i * 80;     // was: height/2 - 90 + i * 80
 }
 
 void drawPauseMenu() {

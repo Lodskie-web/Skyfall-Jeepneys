@@ -148,5 +148,6 @@ void draw() {
     drawLeaderboard();
   }
 
+  drawQuitConfirm();  
   sfxUpdate();
 }

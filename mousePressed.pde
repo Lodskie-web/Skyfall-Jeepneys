@@ -1,21 +1,30 @@
 void mousePressed() {
 
-  // ================= MENU =================
-  if (gameState == 0) {
+  // ================= "ARE YOU SURE YOU WANT TO QUIT?" WINDOW =================
+  // while it is open, only its two buttons work
+  if (confirmQuit != 0) {
 
-    // the "delete player?" window is open: only its two buttons work
-    if (confirmDelete) {
-      if (overButton(width/2 - 120, 425, 200, 54)) {
-        deleteCurrentPlayer();
-        confirmDelete = false;
-        return;
-      }
-      if (overButton(width/2 + 120, 425, 200, 54)) {
-        confirmDelete = false;
-        return;
+    if (overButton(width/2 - 120, 425, 200, 54)) {
+      int what = confirmQuit;
+      confirmQuit = 0;
+      if (what == 1) {
+        exit();            // quit the game
+      } else {
+        goToMenu();        // quit the current run, back to the menu
       }
       return;
     }
+
+    if (overButton(width/2 + 120, 425, 200, 54)) {
+      confirmQuit = 0;
+      return;
+    }
+
+    return;
+  }
+
+  // ================= MENU =================
+  if (gameState == 0) {
 
     if (overButton(width/2, 375, 270, 54)) {
       if (playerName.length() == 0) {
@@ -37,23 +46,14 @@ void mousePressed() {
       return;
     }
 
+    // QUIT: ask first
     if (overButton(width/2, 570, 270, 54)) {
-      exit();
+      confirmQuit = 1;
       return;
     }
 
-    // player chip: pencil = edit name, trash = delete, name area = switch player
-    if (overPlayerEdit()) {
-      openEditName();
-      return;
-    }
-
-    if (overPlayerDelete()) {
-      confirmDelete = true;
-      return;
-    }
-
-    if (overPlayerSwitch()) {
+    // player chip -> player login screen
+    if (overButton(125, 42, 230, 52)) {
       openNameEntry(false);
       return;
     }
@@ -74,8 +74,9 @@ void mousePressed() {
         return;
       }
 
+      // QUIT TO MENU: ask first
       if (overButton(width/2, pauseBtnY(2), 280, 64)) {
-        goToMenu();
+        confirmQuit = 2;
         return;
       }
     }
@@ -112,20 +113,54 @@ void mousePressed() {
   // ================= PLAYER LOGIN / EDIT NAME =================
   else if (gameState == 4) {
 
-    if (overButton(width/2 - 130, 520, 240, 56)) {
+    // the "delete player?" window is open: only its two buttons work
+    if (confirmDelete) {
+
+      if (overButton(width/2 - 120, 425, 200, 54)) {
+        deleteCurrentPlayer();
+        confirmDelete = false;
+        nameInput = "";
+        editingName = false;
+        return;
+      }
+
+      if (overButton(width/2 + 120, 425, 200, 54)) {
+        confirmDelete = false;
+        return;
+      }
+
+      return;
+    }
+
+    // bottom row
+    if (overButton(370, 519, 240, 50)) {
       submitName();
       return;
     }
 
-    if (overButton(width/2 + 130, 520, 200, 56)) {
+    if (overButton(630, 519, 240, 50)) {
       gameState = 0;
       return;
+    }
+
+    // top row (only shown when someone is logged in and not already editing)
+    if (playerName.length() > 0 && !editingName) {
+
+      if (overButton(370, 462, 240, 46)) {
+        openEditName();
+        return;
+      }
+
+      if (overButton(630, 462, 240, 46)) {
+        confirmDelete = true;
+        return;
+      }
     }
 
     // returning players (only on the login screen, not while editing)
     if (!editingName) {
       for (int i = 0; i < recentNames.size(); i++) {
-        if (overButton(nameChipX(i), nameChipY(i), 180, 40)) {
+        if (overButton(nameChipX(i), nameChipY(i), 180, 38)) {
           loginAs(recentNames.get(i));
           return;
         }
@@ -159,25 +194,41 @@ void keyPressed() {
   // ESC normally closes the sketch: block that and use it as pause / back
   if (key == ESC) {
     key = 0;
-    if (gameState == 0) {
-      confirmDelete = false;
-    } else if (gameState == 1) {
+
+    // a quit confirmation is open: ESC just closes it
+    if (confirmQuit != 0) {
+      confirmQuit = 0;
+      return;
+    }
+
+    if (gameState == 1) {
       togglePause();
     } else if (gameState == 2) {
       gameState = 0;
     } else if (gameState == 3) {
       goToMenu();
     } else if (gameState == 4) {
-      gameState = 0;
+      if (confirmDelete) {
+        confirmDelete = false;       // close the delete window first
+      } else {
+        gameState = 0;
+      }
     } else if (gameState == 5) {
       gameState = leaderboardFrom;
     }
     return;
   }
 
+  // while the quit confirmation is open, ignore every other key
+  if (confirmQuit != 0) {
+    return;
+  }
+
   // typing your name: letters must NOT trigger movement / pause / mute
   if (gameState == 4) {
-    handleNameKey();
+    if (!confirmDelete) {
+      handleNameKey();
+    }
     return;
   }
 
@@ -227,6 +278,7 @@ void goToMenu() {
   isPaused = false;
   countdownActive = false;
   confirmDelete = false;
+  confirmQuit = 0;
   gameState = 0;
   bgMusic.stop();
   bgMusic1.loop();
