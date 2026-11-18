@@ -1,3 +1,4 @@
+
 void restartGame() {
   lives = 3;
   jeepneys.clear();
@@ -8,7 +9,9 @@ void restartGame() {
 
   score = 0;
   startFrame = frameCount;
-
-  score = 0;
   scoreBoard = frameCount;
+
+  // Reset invincibility
+  invincibleUntil = 0;
+  lifeFlashUntil = 0;
 }

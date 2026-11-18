@@ -1,3 +1,4 @@
+
 void drawGame() {
 
   background(40, 70, 120);
@@ -37,16 +38,23 @@ void drawGame() {
     j.update();
     j.display();
 
-    // Collision
-    if (j.hitPlayer(player) && !j.scored) {
+    // Collision with invincibility protection
+    if (j.hitPlayer(player) &&
+        !j.scored &&
+        millis() >= invincibleUntil) {
+
       j.scored = true;
       lives--;
+
+      // Protect the player for 2 seconds
+      invincibleUntil = millis() + 2000;
 
       lifeFlashUntil = millis() + 1500;
 
       for (Jeepney jeep : jeepneys) {
         jeep.slowDown();
       }
+
       bgMusic2.play();
 
       if (lives <= 0) {
@@ -61,5 +69,4 @@ void drawGame() {
       j.scored = true;
     }
   }
-
 }
