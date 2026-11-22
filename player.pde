@@ -1,3 +1,4 @@
+
 class Player extends GameObject {
 
   PImage playerIdle;
@@ -56,7 +57,17 @@ class Player extends GameObject {
 
   @Override
   void display() {
-    imageMode(CENTER);
-    image(currentImg, x, y, w, h);
+
+    // Check if player is invincible
+    boolean invincible = millis() < invincibleUntil;
+
+    // Blink every 100 milliseconds
+    boolean visible = !invincible ||
+                      (millis() / 100) % 2 == 0;
+
+    if (visible) {
+      imageMode(CENTER);
+      image(currentImg, x, y, w, h);
+    }
   }
 }
