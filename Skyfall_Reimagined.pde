@@ -1,4 +1,6 @@
+
 import processing.sound.*;
+
 SoundFile bgMusic;
 SoundFile bgMusic1;
 SoundFile bgMusic2;
@@ -13,6 +15,9 @@ int score = 0;
 int survivalTime = 0;
 int lives = 3;
 int lifeFlashUntil = 0;
+
+// Hit invincibility timer
+int invincibleUntil = 0;
 
 PFont bold;
 PFont titleFont;
@@ -29,13 +34,17 @@ void setup() {
   background1 = loadImage("menuBackg.png");
   gameover = loadImage("gameOver.png");
   gameover.resize(width, height);
+
   bgMusic1 = new SoundFile(this, "jeepneyEng.mp3");
   bgMusic = new SoundFile(this, "traffic.mp3");
   bgMusic1.loop();
   bgMusic2 = new SoundFile(this, "crash.mp3");
+
   player = new Player();
+
   jeepney = loadImage("jeepney.png");
   jeepney1 = loadImage("jeepney1.png");
+
   jeepneys = new ArrayList<Jeepney>();
 
   for (int i = 0; i < 5; i++) {
