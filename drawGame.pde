@@ -15,8 +15,8 @@ void drawGame() {
 
     // Collision with invincibility protection
     if (j.hitPlayer(player) &&
-        !j.scored &&
-        millis() >= invincibleUntil) {
+      !j.scored &&
+      millis() >= invincibleUntil) {
 
       j.scored = true;
       lives--;
@@ -25,6 +25,10 @@ void drawGame() {
       invincibleUntil = millis() + 2000;
 
       lifeFlashUntil = millis() + 1500;
+
+      // ARAY popup
+      popup("ARAY!", player.getX(), player.getY() - 80,
+        color(220, 40, 40), color(255), 46, 1000);
 
       for (Jeepney jeep : jeepneys) {
         jeep.slowDown();
@@ -45,6 +49,21 @@ void drawGame() {
     }
   }
 
+  // Display and remove expired popups
+  for (int i = popups.size() - 1; i >= 0; i--) {
+    PopText pt = popups.get(i);
+    pt.display();
+
+    if (pt.isDead()) {
+      popups.remove(i);
+    }
+  }
+
   // Draw HUD on top of the game
   drawHUD();
 }
+
+void popup(String msg, float x, float y, color fillC, color outlineC, float txtSize, int life) {
+  popups.add(new PopText(msg, x, y, fillC, outlineC, txtSize, life));
+}
+

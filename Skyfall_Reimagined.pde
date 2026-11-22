@@ -1,4 +1,3 @@
-
 import processing.sound.*;
 
 SoundFile bgMusic;
@@ -7,6 +6,7 @@ SoundFile bgMusic2;
 
 Player player;
 ArrayList<Jeepney> jeepneys;
+ArrayList<PopText> popups;
 
 int startFrame = 0;
 int scoreBoard = 0;
@@ -46,6 +46,7 @@ void setup() {
   jeepney1 = loadImage("jeepney1.png");
 
   jeepneys = new ArrayList<Jeepney>();
+  popups = new ArrayList<PopText>();
 
   for (int i = 0; i < 5; i++) {
     jeepneys.add(new Jeepney());
