@@ -1,9 +1,15 @@
 void drawGame() {
 
+  // Update the game clock using real elapsed time
+  int now = millis();
+  int dt = min(now - lastMillis, 100);
+  lastMillis = now;
+
+  gameMs += dt;
+  survivalTime = gameMs / 1000;
+
   background(40, 70, 120);
   image(background, 80, 250, 1900, 800);
-
-  survivalTime = (frameCount - startFrame) / 30;
 
   player.update();
   player.display();
@@ -66,4 +72,3 @@ void drawGame() {
 void popup(String msg, float x, float y, color fillC, color outlineC, float txtSize, int life) {
   popups.add(new PopText(msg, x, y, fillC, outlineC, txtSize, life));
 }
-
