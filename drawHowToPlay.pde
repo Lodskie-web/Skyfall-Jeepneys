@@ -161,6 +161,6 @@ void drawHowToPlay() {
   text("YOU HAVE ONLY 3 LIVES.", 500, 440);
 
   // ================= BACK BUTTON =================
-  drawButton(width/2, 625, 220, 55, "BACK");
+  drawButton(width/2, 621, 220, 55, "BACK");
 
 }

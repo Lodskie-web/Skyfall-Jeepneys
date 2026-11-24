@@ -26,7 +26,7 @@ void mousePressed() {
   // ================= HOW TO PLAY =================
   else if (gameState == 2) {
 
-    if (overButton(width/2, 640, 220, 55)) {
+    if (overButton(width/2, 621, 220, 55)) {
       gameState = 0;
       return;
     }
@@ -52,10 +52,10 @@ void mousePressed() {
 }
 
 boolean overButton(float x, float y,
-                   float w, float h) {
+  float w, float h) {
 
   return mouseX > x - w/2 &&
-         mouseX < x + w/2 &&
-         mouseY > y - h/2 &&
-         mouseY < y + h/2;
+    mouseX < x + w/2 &&
+    mouseY > y - h/2 &&
+    mouseY < y + h/2;
 }
