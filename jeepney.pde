@@ -2,18 +2,29 @@ class Jeepney extends GameObject {
   float speed;
   float normalSpeed;
 
+  int lane;
+
   boolean scored = false;
   boolean slowed = false;
   int slowUntil = 0;
 
   Jeepney() {
-
-    super(
-      random(width),
-      random(-500, -100), 120, 160);
+    super(width / 2, -300, 120, 160);
 
     normalSpeed = random(5, 10);
     speed = normalSpeed;
+
+    respawn();
+  }
+
+  void respawn() {
+    float newY = random(-450, -100);
+
+    lane = pickFreeLane(newY, this);
+    x = laneX(lane) + random(-15, 15);
+    y = newY;
+
+    scored = false;
   }
 
   @Override
@@ -32,9 +43,7 @@ class Jeepney extends GameObject {
     }
 
     if (y > height) {
-      y = random(-300, -50);
-      x = random(width);
-      scored = false;
+      respawn();
     }
   }
 

@@ -17,6 +17,7 @@ int lives = 3;
 int lifeFlashUntil = 0;
 int gameMs = 0;
 int lastMillis = 0;
+final int LANES = 8;
 
 // Hit invincibility timer
 int invincibleUntil = 0;
