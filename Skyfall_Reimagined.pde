@@ -18,6 +18,8 @@ int lifeFlashUntil = 0;
 int gameMs = 0;
 int lastMillis = 0;
 final int LANES = 8;
+int nextJeepneyAt = 0;
+final int MAX_BASE_JEEPNEYS = 12;
 
 // Hit invincibility timer
 int invincibleUntil = 0;

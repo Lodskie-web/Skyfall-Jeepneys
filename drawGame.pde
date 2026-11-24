@@ -8,6 +8,18 @@ void drawGame() {
   gameMs += dt;
   survivalTime = gameMs / 1000;
 
+  // ---------- difficulty: one more jeepney every 15-20 seconds ----------
+if (gameNow() >= nextJeepneyAt) {
+  if (baseJeepneyCount() < MAX_BASE_JEEPNEYS) {
+    jeepneys.add(new Jeepney());
+
+    popup("DAGDAG JEEPNEY!", width/2, 215,
+      color(255, 210, 0), color(0, 40, 120), 38, 1600);
+  }
+
+  nextJeepneyAt = gameNow() + int(random(15000, 20000));
+}
+
   background(40, 70, 120);
   image(background, 80, 250, 1900, 800);
 

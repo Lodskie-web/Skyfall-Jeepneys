@@ -6,7 +6,12 @@ float laneX(int lane) {
   return (lane + 0.5) * (width / (float) LANES);
 }
 
-// picks a lane with no other jeepney near the spawn height
+// Counts regular jeepneys in this release
+int baseJeepneyCount() {
+  return jeepneys.size();
+}
+
+// Picks a lane with no other jeepney near the spawn height
 int pickFreeLane(float newY, Jeepney self) {
   for (int tries = 0; tries < 15; tries++) {
     int l = int(random(LANES));

@@ -15,7 +15,11 @@ void restartGame() {
   lastMillis = millis();
   survivalTime = 0;
 
+  // Reset difficulty timer
+  nextJeepneyAt = int(random(15000, 20000));
+
   // Reset invincibility
   invincibleUntil = 0;
   lifeFlashUntil = 0;
 }
+
