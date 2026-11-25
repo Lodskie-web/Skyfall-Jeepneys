@@ -1,4 +1,5 @@
 class Jeepney extends GameObject {
+
   float speed;
   float normalSpeed;
 

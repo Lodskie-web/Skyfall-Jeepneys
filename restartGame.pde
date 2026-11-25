@@ -15,6 +15,11 @@ void restartGame() {
   lastMillis = millis();
   survivalTime = 0;
 
+  // Start countdown
+  countdownActive = true;
+  countdownStart = millis();
+  lastCountStep = -1;
+
   // Reset difficulty timer
   nextJeepneyAt = int(random(15000, 20000));
 
@@ -22,4 +27,3 @@ void restartGame() {
   invincibleUntil = 0;
   lifeFlashUntil = 0;
 }
-

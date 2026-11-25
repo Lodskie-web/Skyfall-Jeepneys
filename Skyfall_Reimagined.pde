@@ -18,6 +18,11 @@ int lifeFlashUntil = 0;
 int gameMs = 0;
 int lastMillis = 0;
 
+// 3-2-1-GO countdown
+boolean countdownActive = false;
+int countdownStart = 0;
+int lastCountStep = -1;
+
 final int LANES = 8;
 int nextJeepneyAt = 0;
 final int MAX_BASE_JEEPNEYS = 12;
@@ -30,6 +35,8 @@ int invincibleUntil = 0;
 
 PFont bold;
 PFont titleFont;
+PFont hudFont;
+
 PImage background1;
 PImage jeepney;
 PImage jeepney1;
@@ -37,6 +44,7 @@ PImage background;
 PImage gameover;
 
 void setup() {
+  frameRate(60);
   size(1000, 650);
 
   background = loadImage("backgroundG.png");
@@ -48,6 +56,9 @@ void setup() {
   bgMusic = new SoundFile(this, "traffic.mp3");
   bgMusic1.loop();
   bgMusic2 = new SoundFile(this, "crash.mp3");
+
+  // Initialize countdown sound
+  sfxInit();
 
   player = new Player();
 
@@ -65,6 +76,7 @@ void setup() {
   textAlign(CENTER, CENTER);
 
   titleFont = createFont("Arial Bold", 40);
+  hudFont = createFont("Arial Bold", 30);
 }
 
 void draw() {
@@ -73,17 +85,15 @@ void draw() {
 
   if (gameState == 0) {
     drawMenu();
-  }
-
-  else if (gameState == 1) {
+  } else if (gameState == 1) {
     drawGame();
-  }
-
-  else if (gameState == 2) {
+  } else if (gameState == 2) {
     drawHowToPlay();
-  }
-
-  else if (gameState == 3) {
+  } else if (gameState == 3) {
     drawGameOver();
   }
+
+  // Update sound effects every frame
+  sfxUpdate();
 }
+
