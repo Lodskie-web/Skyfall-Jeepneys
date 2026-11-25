@@ -1,4 +1,3 @@
-
 class Player extends GameObject {
 
   PImage playerIdle;
@@ -8,6 +7,8 @@ class Player extends GameObject {
 
   float lastX;
   int idleTimer;
+
+  float keySpeed = 10;
 
   float getX() {
     return x;
@@ -36,14 +37,22 @@ class Player extends GameObject {
   }
 
   @Override
-  void update() {
-    setX(mouseX);
+    void update() {
+
+    // Keyboard (arrows or A/D) OR mouse
+    if (leftHeld || rightHeld) {
+      if (leftHeld)  x -= keySpeed;
+      if (rightHeld) x += keySpeed;
+    } else if (mouseX != pmouseX) {
+      x = mouseX;
+    }
+
+    x = constrain(x, 0, width);
 
     if (x > lastX + 2) {
       currentImg = playerRight;
       idleTimer = millis();
-    }
-    else if (x < lastX - 2) {
+    } else if (x < lastX - 2) {
       currentImg = playerLeft;
       idleTimer = millis();
     }
@@ -56,14 +65,14 @@ class Player extends GameObject {
   }
 
   @Override
-  void display() {
+    void display() {
 
     // Check if player is invincible
     boolean invincible = millis() < invincibleUntil;
 
     // Blink every 100 milliseconds
     boolean visible = !invincible ||
-                      (millis() / 100) % 2 == 0;
+      (millis() / 100) % 2 == 0;
 
     if (visible) {
       imageMode(CENTER);
