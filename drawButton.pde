@@ -31,7 +31,8 @@ void drawButton(float x, float y,
 
   // HOW TO PLAY + PLAY AGAIN = YELLOW
   else if (label.equals("HOW TO PLAY") ||
-           label.equals("PLAY AGAIN")) {
+           label.equals("PLAY AGAIN") || 
+           label.equals("RESUME")) {
 
     topColor = color(255, 230, 50);
     bottomColor = color(230, 170, 0);

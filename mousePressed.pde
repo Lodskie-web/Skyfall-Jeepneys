@@ -32,6 +32,40 @@ void mousePressed() {
     }
   }
 
+  // ================= GAME =================
+  else if (gameState == 1) {
+
+    // Only the pause menu buttons work while paused
+    if (isPaused) {
+
+      // RESUME
+      if (overButton(width/2, pauseBtnY(0), 280, 64)) {
+        setPaused(false);
+        return;
+      }
+
+      // SOUND ON / OFF
+      if (overButton(width/2, pauseBtnY(1), 280, 64)) {
+        toggleMute();
+        return;
+      }
+
+      // QUIT TO MENU
+      if (overButton(width/2, pauseBtnY(2), 280, 64)) {
+        setPaused(false);
+        countdownActive = false;
+
+        gameState = 0;
+
+        bgMusic.stop();
+        bgMusic1.loop();
+
+        sfxStopAll();
+        return;
+      }
+    }
+  }
+
   // ================= GAME OVER =================
   else if (gameState == 3) {
 
@@ -50,6 +84,7 @@ void mousePressed() {
     }
   }
 }
+
 
 boolean overButton(float x, float y,
   float w, float h) {

@@ -1,4 +1,5 @@
 void restartGame() {
+
   lives = 3;
   jeepneys.clear();
 
@@ -14,6 +15,12 @@ void restartGame() {
   gameMs = 0;
   lastMillis = millis();
   survivalTime = 0;
+
+  // Reset pause state
+  isPaused = false;
+
+  // Stop existing sound effects
+  sfxStopAll();
 
   // Start countdown
   countdownActive = true;

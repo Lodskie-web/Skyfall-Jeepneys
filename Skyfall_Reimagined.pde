@@ -4,6 +4,10 @@ SoundFile bgMusic;
 SoundFile bgMusic1;
 SoundFile bgMusic2;
 
+Sound masterVolume;
+boolean muted = false;
+boolean isPaused = false;
+
 Player player;
 ArrayList<Jeepney> jeepneys;
 ArrayList<PopText> popups;
@@ -57,6 +61,9 @@ void setup() {
   bgMusic1.loop();
   bgMusic2 = new SoundFile(this, "crash.mp3");
 
+  // Master volume for the mute feature
+  masterVolume = new Sound(this);
+
   // Initialize countdown sound
   sfxInit();
 
@@ -96,4 +103,3 @@ void draw() {
   // Update sound effects every frame
   sfxUpdate();
 }
-

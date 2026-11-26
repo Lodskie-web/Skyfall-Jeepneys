@@ -11,21 +11,21 @@ void drawGame() {
   // Update countdown
   if (countdownActive) {
     updateCountdown();
+
+    // Player movement continues during countdown
+    player.update();
   }
 
-  // Player movement must continue every frame
-  player.update();
-
-  // Game only runs after countdown
-  boolean running = !countdownActive;
-
-  if (!running) {
-    dt = 0;
-  }
+  // Game only runs after countdown and when not paused
+  boolean running = !isPaused && !countdownActive;
 
   if (running) {
+
     gameMs += dt;
     survivalTime = gameMs / 1000;
+
+    // Player movement
+    player.update();
 
     // Difficulty: one more jeepney every 15-20 seconds
     if (gameNow() >= nextJeepneyAt) {
@@ -110,6 +110,11 @@ void drawGame() {
   // Countdown appears above the HUD
   if (countdownActive) {
     drawCountdown();
+  }
+
+  // Pause menu appears above everything
+  if (isPaused) {
+    drawPauseMenu();
   }
 }
 
