@@ -95,6 +95,60 @@ void collectPickup(Pickup p) {
 }
 
 
+// ================= SAKTO NEAR-MISS SYSTEM =================
+
+int lastNearMiss = -1200;
+
+final float NEAR_MISS_DISTANCE = 95;
+final int NEAR_MISS_COOLDOWN = 1200;
+
+
+// Track the closest distance between a jeepney and the player
+void trackNearMissDistance(Jeepney jeepney) {
+
+  if (jeepney.scored) {
+    return;
+  }
+
+  float currentDistance = dist(
+    jeepney.x,
+    jeepney.y,
+    player.getX(),
+    player.getY()
+    );
+
+  if (currentDistance < jeepney.minDist) {
+    jeepney.minDist = currentDistance;
+  }
+}
+
+
+// Check whether the jeepney qualifies for a SAKTO bonus
+boolean qualifiesForNearMiss(Jeepney jeepney) {
+
+  return jeepney.minDist < NEAR_MISS_DISTANCE &&
+    gameNow() - lastNearMiss > NEAR_MISS_COOLDOWN;
+}
+
+
+// Award the near-miss bonus
+void awardNearMissBonus() {
+
+  lastNearMiss = gameNow();
+  score += 2;
+
+  popup(
+    "SAKTO! +2",
+    player.getX(),
+    player.getY() - 90,
+    color(255, 210, 0),
+    color(0, 40, 120),
+    42,
+    900
+    );
+}
+
+
 // ================= COUNTDOWN =================
 
 void updateCountdown() {

@@ -42,4 +42,7 @@ void restartGame() {
 
   // Reset shield
   player.hasShield = false;
+
+  // Reset SAKTO near-miss cooldown
+  lastNearMiss = -1200;
 }

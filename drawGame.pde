@@ -53,6 +53,8 @@ void drawGame() {
     }
   }
 
+  // ================= WORLD =================
+
   background(40, 70, 120);
   image(background, 80, 250, 1900, 800);
 
@@ -63,6 +65,9 @@ void drawGame() {
 
     if (running) {
       j.update();
+
+      // Track the closest distance for the SAKTO bonus
+      trackNearMissDistance(j);
     }
 
     j.display();
@@ -110,22 +115,23 @@ void drawGame() {
         }
       }
 
-      // Score when jeepney passes player
+      // Jeepney passes player
       if (!j.scored && j.y > player.y) {
+
+        // Normal passing score
         score++;
         j.scored = true;
+
+        // Additional SAKTO near-miss bonus
+        if (qualifiesForNearMiss(j)) {
+          awardNearMissBonus();
+        }
       }
     }
   }
 
-  // Coffee slow-mo tint
-  if (gameNow() < slowMoUntil) {
-    noStroke();
-    fill(150, 90, 30, 40);
-    rect(width/2, height/2, width, height);
-  }
+  // ================= PICKUPS =================
 
-  // Pickups
   for (int i = pickups.size() - 1; i >= 0; i--) {
 
     Pickup p = pickups.get(i);
@@ -149,6 +155,13 @@ void drawGame() {
 
     p.display();
   }
+
+  // ================= VISUAL EFFECTS =================
+
+  // KAPE tint covers the world and pickups
+  drawCoffeeTint();
+
+  // ================= POPUPS =================
 
   // Display and remove expired popups
   for (int i = popups.size() - 1; i >= 0; i--) {

@@ -9,6 +9,9 @@ class Jeepney extends GameObject {
   boolean slowed = false;
   int slowUntil = 0;
 
+  // Closest distance to the player during this pass
+  float minDist = Float.MAX_VALUE;
+
   Jeepney() {
     super(width / 2, -300, 120, 160);
 
@@ -19,6 +22,7 @@ class Jeepney extends GameObject {
   }
 
   void respawn() {
+
     float newY = random(-450, -100);
 
     lane = pickFreeLane(newY, this);
@@ -26,6 +30,9 @@ class Jeepney extends GameObject {
     y = newY;
 
     scored = false;
+
+    // Reset near-miss tracking for the new jeepney pass
+    minDist = Float.MAX_VALUE;
   }
 
   @Override
