@@ -45,4 +45,11 @@ void restartGame() {
 
   // Reset SAKTO near-miss cooldown
   lastNearMiss = -1200;
+
+  // Reset environment
+  envPhase = 0;
+  rainAmount = 0;
+  lastEnvStage = 0;
+  nextLightning = 0;
+  lightningUntil = 0;
 }

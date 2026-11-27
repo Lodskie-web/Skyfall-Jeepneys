@@ -46,6 +46,21 @@ boolean rightHeld = false;
 // Hit invincibility timer
 int invincibleUntil = 0;
 
+// Environment
+final int SUNSET_SCORE = 40;
+final int NIGHT_SCORE = 90;
+final int RAIN_SCORE = 140;
+
+float envPhase = 0;
+float rainAmount = 0;
+int lastEnvStage = 0;
+int nextLightning = 0;
+int lightningUntil = 0;
+
+float[] rainX = new float[160];
+float[] rainY = new float[160];
+float[] rainSpd = new float[160];
+
 PFont bold;
 PFont titleFont;
 PFont hudFont;
@@ -88,6 +103,9 @@ void setup() {
   for (int i = 0; i < 5; i++) {
     jeepneys.add(new Jeepney());
   }
+
+  // Initialize environment rain
+  initRain();
 
   rectMode(CENTER);
   textAlign(CENTER, CENTER);

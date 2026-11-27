@@ -1,3 +1,4 @@
+
 void drawGame() {
 
   imageMode(CENTER);
@@ -23,6 +24,9 @@ void drawGame() {
 
     gameMs += dt;
     survivalTime = gameMs / 1000;
+
+    // Update environment based on score
+    updateEnvironment();
 
     // Player movement
     player.update();
@@ -155,6 +159,11 @@ void drawGame() {
 
     p.display();
   }
+
+  // ================= ENVIRONMENT EFFECTS =================
+
+  drawEnvOverlay(0.35);
+  drawRain();
 
   // ================= VISUAL EFFECTS =================
 
