@@ -40,6 +40,61 @@ int baseJeepneyCount() {
 }
 
 
+// ================= POWER-UPS =================
+
+// Randomly selects pandesal, kape, or sampaguita
+int randomPowerupType() {
+
+  int t = 1 + int(random(3));
+
+  // Do not spawn pandesal when lives are already full
+  if (t == 1 && lives >= MAX_LIVES) {
+    t = 2 + int(random(2));
+  }
+
+  return t;
+}
+
+
+// What happens when a pickup is collected
+void collectPickup(Pickup p) {
+
+  if (p.type == 0) {
+
+    // Piso coin: +5 points
+    score += 5;
+
+    popup("+5", p.x, p.y - 30,
+      color(255, 210, 0), color(120, 70, 0), 40, 800);
+  } else if (p.type == 1) {
+
+    // Pandesal: +1 life, up to 5
+    if (lives < MAX_LIVES) {
+      lives++;
+    } else {
+      score += 5;
+    }
+
+    popup("+1 BUHAY!", p.x, p.y - 30,
+      color(220, 40, 40), color(255), 42, 1100);
+  } else if (p.type == 2) {
+
+    // Kape: slow motion for 6 seconds
+    slowMoUntil = gameNow() + SLOWMO_MS;
+
+    popup("KAPE TIME!", p.x, p.y - 30,
+      color(120, 70, 30), color(255), 42, 1100);
+  } else {
+
+    // Sampaguita: one-hit shield
+    player.hasShield = true;
+
+    popup("SAMPAGUITA!", p.x, p.y - 30,
+      color(255), color(40, 120, 50), 38, 1100);
+  }
+}
+
+
 // ================= COUNTDOWN =================
 
 void updateCountdown() {
@@ -169,4 +224,3 @@ void shadowText(String s, float x, float y) {
   fill(255);
   text(s, x, y);
 }
-

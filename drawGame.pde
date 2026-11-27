@@ -39,6 +39,18 @@ void drawGame() {
 
       nextJeepneyAt = gameNow() + int(random(15000, 20000));
     }
+
+    // Spawn piso coins
+    if (gameNow() >= nextCoinAt) {
+      pickups.add(new Pickup(0));
+      nextCoinAt = gameNow() + int(random(2500, 5000));
+    }
+
+    // Spawn other power-ups
+    if (gameNow() >= nextPowerupAt) {
+      pickups.add(new Pickup(randomPowerupType()));
+      nextPowerupAt = gameNow() + int(random(14000, 22000));
+    }
   }
 
   background(40, 70, 120);
@@ -46,6 +58,7 @@ void drawGame() {
 
   player.display();
 
+  // Jeepneys
   for (Jeepney j : jeepneys) {
 
     if (running) {
@@ -62,26 +75,38 @@ void drawGame() {
         millis() >= invincibleUntil) {
 
         j.scored = true;
-        lives--;
 
-        // Protect the player for 2 seconds
-        invincibleUntil = millis() + 2000;
+        // Sampaguita shield absorbs one collision
+        if (player.hasShield) {
 
-        lifeFlashUntil = millis() + 1500;
+          player.hasShield = false;
+          invincibleUntil = millis() + 1000;
 
-        // ARAY popup
-        popup("ARAY!", player.getX(), player.getY() - 80,
-          color(220, 40, 40), color(255), 46, 1000);
+          popup("ILAG!", player.getX(), player.getY() - 80,
+            color(0, 90, 220), color(255), 46, 1000);
+        } else {
 
-        for (Jeepney jeep : jeepneys) {
-          jeep.slowDown();
-        }
+          lives--;
 
-        bgMusic2.play();
+          // Protect the player for 2 seconds
+          invincibleUntil = millis() + 2000;
 
-        if (lives <= 0) {
-          gameState = 3;
-          bgMusic.stop();
+          lifeFlashUntil = millis() + 1500;
+
+          // ARAY popup
+          popup("ARAY!", player.getX(), player.getY() - 80,
+            color(220, 40, 40), color(255), 46, 1000);
+
+          for (Jeepney jeep : jeepneys) {
+            jeep.slowDown();
+          }
+
+          bgMusic2.play();
+
+          if (lives <= 0) {
+            gameState = 3;
+            bgMusic.stop();
+          }
         }
       }
 
@@ -91,6 +116,38 @@ void drawGame() {
         j.scored = true;
       }
     }
+  }
+
+  // Coffee slow-mo tint
+  if (gameNow() < slowMoUntil) {
+    noStroke();
+    fill(150, 90, 30, 40);
+    rect(width/2, height/2, width, height);
+  }
+
+  // Pickups
+  for (int i = pickups.size() - 1; i >= 0; i--) {
+
+    Pickup p = pickups.get(i);
+
+    if (running) {
+      p.update();
+
+      // Collect pickup
+      if (dist(p.x, p.y, player.getX(), player.getY()) < 60) {
+        collectPickup(p);
+        pickups.remove(i);
+        continue;
+      }
+
+      // Remove pickups that leave the screen
+      if (p.y > height + 60) {
+        pickups.remove(i);
+        continue;
+      }
+    }
+
+    p.display();
   }
 
   // Display and remove expired popups

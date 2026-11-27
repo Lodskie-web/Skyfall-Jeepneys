@@ -11,6 +11,7 @@ boolean isPaused = false;
 Player player;
 ArrayList<Jeepney> jeepneys;
 ArrayList<PopText> popups;
+ArrayList<Pickup> pickups;
 
 int startFrame = 0;
 int scoreBoard = 0;
@@ -30,6 +31,14 @@ int lastCountStep = -1;
 final int LANES = 8;
 int nextJeepneyAt = 0;
 final int MAX_BASE_JEEPNEYS = 12;
+
+// Power-ups
+final int MAX_LIVES = 5;
+final int SLOWMO_MS = 6000;
+
+int nextCoinAt = 0;
+int nextPowerupAt = 0;
+int slowMoUntil = 0;
 
 boolean leftHeld = false;
 boolean rightHeld = false;
@@ -74,6 +83,7 @@ void setup() {
 
   jeepneys = new ArrayList<Jeepney>();
   popups = new ArrayList<PopText>();
+  pickups = new ArrayList<Pickup>();
 
   for (int i = 0; i < 5; i++) {
     jeepneys.add(new Jeepney());

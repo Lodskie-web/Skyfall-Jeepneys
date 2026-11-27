@@ -29,14 +29,17 @@ class Jeepney extends GameObject {
   }
 
   @Override
-  void update() {
+    void update() {
 
     if (slowed && millis() > slowUntil) {
       speed = normalSpeed;
       slowed = false;
     }
 
-    y += speed;
+    // Kape slows jeepney movement by half
+    float mult = (gameNow() < slowMoUntil) ? 0.5 : 1;
+
+    y += speed * mult;
 
     if (!slowed) {
       speed += 0.001;
@@ -49,7 +52,7 @@ class Jeepney extends GameObject {
   }
 
   @Override
-  void display() {
+    void display() {
     imageMode(CENTER);
     image(jeepney1, x, y, w, h);
   }
